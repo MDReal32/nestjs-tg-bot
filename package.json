@@ -1,22 +1,44 @@
 {
   "name": "@mdreal/nestjs-tg-bot",
-  "version": "0.0.2",
+  "version": "0.0.3",
+  "description": "NestJS module for building Telegram bots with grammY. Supports multiple bots, decorators, injection, polling, and webhooks.",
+  "keywords": [
+    "nestjs",
+    "telegram",
+    "grammy",
+    "bot",
+    "decorators",
+    "module"
+  ],
+  "homepage": "https://github.com/MDReal32/nestjs-tg-bot#readme",
+  "bugs": {
+    "url": "https://github.com/MDReal32/nestjs-tg-bot/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MDReal32/nestjs-tg-bot.git"
+  },
+  "license": "MIT",
+  "author": "MDReal",
   "type": "module",
   "exports": {
     ".": {
-      "types": "./build/nestjs-tg-bot.d.ts",
-      "import": "./build/nestjs-tg-bot.js"
+      "import": "./build/nestjs-tg-bot.js",
+      "types": "./build/nestjs-tg-bot.d.ts"
     },
     "./schematics": {}
   },
   "main": "./build/nestjs-tg-bot.js",
   "types": "./build/nestjs-tg-bot.d.ts",
   "files": [
-    "build",
-    "package.json"
+    "build"
   ],
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "format": "prettier --write .",
+    "lint": "prettier --check .",
+    "prepare": "pnpm build",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "grammy": "^1.38.2"
@@ -30,11 +52,14 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "@nestjs/common": "*",
-    "@nestjs/core": "*",
-    "reflect-metadata": "*"
+    "@nestjs/common": "^10 || ^11",
+    "@nestjs/core": "^10 || ^11",
+    "reflect-metadata": "^0.2"
   },
   "packageManager": "pnpm@9.15.3+sha512.1f79bc245a66eb0b07c5d4d83131240774642caaa86ef7d0434ab47c0d16f66b04e21e0c086eb61e62c77efc4d7f7ec071afad3796af64892fae66509173893a",
+  "engines": {
+    "node": ">=22"
+  },
   "publishConfig": {
     "access": "public"
   }
