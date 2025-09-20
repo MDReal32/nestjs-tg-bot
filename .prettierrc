@@ -1,0 +1,18 @@
+{
+  "arrowParens": "avoid",
+  "printWidth": 120,
+  "quoteProps": "consistent",
+  "trailingComma": "none",
+  "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-packagejson"],
+  "importOrder": [
+    "^node:(.*)$|^([of]s|http[2s]?|(perf|async)_hooks|v[8m]|path|url|crypto|stream|buffer|util|querystring|events|assert|constants|zlib|tty|child_process|cluster|dgram|dns|domain|net|readline|repl|tls|inspector|worker_threads|punycode)(/.*$|$)",
+    "^([^.@]*)$",
+    "^@(.+)/(.*)$",
+    "^@/(.*)$",
+    "^[./](.*)(?<!\\.(?:css|svg|png|jpg|jpeg))$",
+    "\\.(?:css|svg|png|jpg|jpeg)$"
+  ],
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}

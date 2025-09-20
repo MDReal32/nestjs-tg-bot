@@ -1,0 +1,41 @@
+{
+  "name": "@mdreal/nestjs-tg-bot",
+  "version": "0.0.2",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./build/nestjs-tg-bot.d.ts",
+      "import": "./build/nestjs-tg-bot.js"
+    },
+    "./schematics": {}
+  },
+  "main": "./build/nestjs-tg-bot.js",
+  "types": "./build/nestjs-tg-bot.d.ts",
+  "files": [
+    "build",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "grammy": "^1.38.2"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "@types/node": "^24.5.2",
+    "prettier": "^3.6.2",
+    "prettier-plugin-packagejson": "^2.5.19",
+    "vite": "^7.1.2",
+    "vite-plugin-dts": "^4.5.4"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "*",
+    "@nestjs/core": "*",
+    "reflect-metadata": "*"
+  },
+  "packageManager": "pnpm@9.15.3+sha512.1f79bc245a66eb0b07c5d4d83131240774642caaa86ef7d0434ab47c0d16f66b04e21e0c086eb61e62c77efc4d7f7ec071afad3796af64892fae66509173893a",
+  "publishConfig": {
+    "access": "public"
+  }
+}
