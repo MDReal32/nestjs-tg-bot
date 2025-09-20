@@ -1,7 +1,7 @@
 # @mdreal/nestjs-tg-bot
 
 [![npm version](https://img.shields.io/npm/v/@mdreal/nestjs-tg-bot)](https://www.npmjs.com/package/@mdreal/nestjs-tg-bot)
-[![License](https://img.shields.io/github/license/mdreal/nestjs-tg-bot)](./LICENSE)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE)
 [![Downloads](https://img.shields.io/npm/dw/@mdreal/nestjs-tg-bot)](https://www.npmjs.com/package/@mdreal/nestjs-tg-bot)
 
 **A fully-typed, decorator-driven [NestJS](https://nestjs.com) module for building Telegram bots with [grammY](https://grammy.dev/).**
@@ -213,4 +213,5 @@ Please open an issue to discuss ideas before submitting PRs.
 
 ## 📄 License
 
-MIT © 2025 [MDReal](https://github.com/mdreal)
+Licensed under the [Apache License 2.0](./LICENSE).  
+Copyright © 2025 [MDReal](https://github.com/mdreal)

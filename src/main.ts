@@ -1,11 +1,13 @@
 import "reflect-metadata";
 
-export * from "./types";
-export * from "./tokens";
-export * from "./registry";
-export * from "./logging/logger";
-export * from "./rate-limit/make-rate-limit";
-export * from "./runtime";
-export * from "./decorators";
-export * from "./binder";
-export * from "./module";
+// Core module
+export { TelegramModule } from "./module/telegram.module";
+
+// Handler decorators
+export { Command, Start, Help, Hears, On, Use, Scope, Scopes } from "./decorators";
+
+// Injection decorators
+export { InjectBot, InjectApi, InjectWebhook, InjectOptions } from "./tokens";
+
+// Public types
+export type { BotInstanceOptions, TelegramModuleAsyncOptions, WebhookOptions } from "./types";

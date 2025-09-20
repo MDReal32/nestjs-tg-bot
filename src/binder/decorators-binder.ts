@@ -1,3 +1,18 @@
+/*
+ * Copyright 2025 MDReal
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import type { Bot, Context as GrammyContext, MiddlewareFn } from "grammy";
 
 import { Injectable, type OnApplicationBootstrap } from "@nestjs/common";
@@ -6,7 +21,14 @@ import { DiscoveryService } from "@nestjs/core";
 import { META_KEYS } from "../decorators";
 import { type BotEntry, TelegramBotsRegistry } from "../registry";
 
-/** Compose middlewares in order: ...classMW, ...methodMW, handler */
+/**
+ * Compose a stack of grammY middlewares into a single middleware function.
+ *
+ * Order of execution:
+ *   1. Class-level `@Use` middlewares
+ *   2. Method-level `@Use` middlewares
+ *   3. The handler itself
+ */
 const compose = <C extends GrammyContext>(
   middlewares: readonly MiddlewareFn<C>[],
   handler: MiddlewareFn<C>
@@ -25,6 +47,23 @@ const compose = <C extends GrammyContext>(
   };
 };
 
+/**
+ * `TelegramDecoratorsBinder`
+ *
+ * A NestJS provider that runs at application bootstrap and binds
+ * all decorated providers (`@Command`, `@Hears`, `@On`, `@Use`)
+ * to the corresponding grammY `Bot` instances.
+ *
+ * It uses Nest's `DiscoveryService` to scan all providers,
+ * checks for metadata defined by the decorators, and registers
+ * the appropriate handlers with the correct bot(s).
+ *
+ * ### Scoping Rules
+ * - If a provider is decorated with `@Scope("name")` or `@Scopes([...])`,
+ *   handlers bind only to those bots.
+ * - If only one bot is registered and no scope is set, handlers bind to that bot.
+ * - Otherwise, handlers default to binding to all bots.
+ */
 @Injectable()
 export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
   constructor(
@@ -32,9 +71,10 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
     private readonly registry: TelegramBotsRegistry
   ) {}
 
+  /** Runs at NestJS bootstrap to wire up all decorated handlers. */
   onApplicationBootstrap(): void {
     const providers = this.discovery.getProviders().filter(w => {
-      // class-based, instantiated providers only
+      // only class-based, instantiated providers
       return !!w.instance && w.metatype && typeof w.metatype === "function";
     });
 
@@ -49,7 +89,7 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
       const classMW = (Reflect.getMetadata(META_KEYS.CLASS_USE, ctor) as MiddlewareFn[] | undefined) ?? [];
       let scopes = (Reflect.getMetadata(META_KEYS.SCOPES, ctor) as string[] | undefined) ?? ([] as string[]);
 
-      // Default scope: if exactly one bot registered and no explicit scopes, bind to that one
+      // Default scope: single bot
       if (scopes.length === 0 && allNames.length === 1) {
         scopes = allNames;
       }
@@ -65,10 +105,10 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
       const ons =
         (Reflect.getMetadata(META_KEYS.ON, ctor) as Array<{ method: string; filter: string }> | undefined) ?? [];
 
-      // If no decorated methods, skip early
+      // Skip if provider has no decorated methods
       if (commands.length === 0 && hears.length === 0 && ons.length === 0) continue;
 
-      // Iterate instance methods
+      // Inspect all instance methods
       const proto = Object.getPrototypeOf(instance);
       const methodNames = Object.getOwnPropertyNames(proto).filter(n => n !== "constructor");
 
@@ -76,11 +116,11 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
         const desc = Object.getOwnPropertyDescriptor(proto, name);
         if (!desc || typeof desc.value !== "function") continue;
 
-        // Collect method-level metadata
+        // Collect method-level middlewares
         const methodMW =
           (Reflect.getMetadata(META_KEYS.METHOD_USE, instance, name) as MiddlewareFn[] | undefined) ?? [];
 
-        // Select decorators targeting this method
+        // Find decorators targeting this method
         const cmds = commands.filter(x => x.method === name);
         const hrs = hears.filter(x => x.method === name);
         const onsx = ons.filter(x => x.method === name);
@@ -97,7 +137,7 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
           if (!entry) continue;
 
           const bindKey = `${ctor.name}:${name}:${botName}`;
-          if (!this.registry.guardBinding(bindKey)) continue; // already bound
+          if (!this.registry.guardBinding(bindKey)) continue; // skip if already bound
 
           const bot = entry.bot as Bot;
 

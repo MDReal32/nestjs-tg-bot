@@ -1,6 +1,6 @@
 {
   "name": "@mdreal/nestjs-tg-bot",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "NestJS module for building Telegram bots with grammY. Supports multiple bots, decorators, injection, polling, and webhooks.",
   "keywords": [
     "nestjs",
@@ -18,7 +18,7 @@
     "type": "git",
     "url": "https://github.com/MDReal32/nestjs-tg-bot.git"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "MDReal",
   "type": "module",
   "exports": {
