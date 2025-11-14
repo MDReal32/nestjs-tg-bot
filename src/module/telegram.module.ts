@@ -168,6 +168,7 @@ export class TelegramModule {
         botProvider,
         apiProvider,
         webhookProvider,
+        // binder (binds decorators on bootstrap)
         TelegramDecoratorsBinder
       ],
       exports: [TG_OPTIONS(name), TG_BOT(name), TG_API(name), TG_WEBHOOK_CALLBACK(name)]

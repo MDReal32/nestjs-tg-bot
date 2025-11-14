@@ -8,7 +8,8 @@ export default defineConfig({
     ssr: true,
     lib: {
       entry: { "nestjs-tg-bot": "src/main.ts" },
-      formats: ["es"]
+      formats: ["es", "cjs"],
+      fileName: (format, entryName) => `${entryName}.${format === "cjs" ? "cjs" : "js"}`,
     }
   }
 });
