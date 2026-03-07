@@ -30,13 +30,6 @@ import type { BotInstanceOptions } from "./bot-instance-options";
  */
 export interface TelegramModuleAsyncOptions<C extends GrammyContext = GrammyContext> {
   /**
-   * Unique bot name.
-   *
-   * Each async registration must provide its own name.
-   */
-  readonly name: string;
-
-  /**
    * A factory function returning the bot options.
    *
    * May return either:
@@ -56,7 +49,7 @@ export interface TelegramModuleAsyncOptions<C extends GrammyContext = GrammyCont
    * })
    * ```
    */
-  readonly useFactory: (...deps: any[]) => Promise<BotInstanceOptions<C>> | BotInstanceOptions<C>;
+  readonly useFactory: (...deps: Type[]) => Promise<BotInstanceOptions<C>> | BotInstanceOptions<C>;
 
   /**
    * Providers to inject into `useFactory`.
