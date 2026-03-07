@@ -15,7 +15,7 @@
  */
 import type { Context as GrammyContext } from "grammy";
 
-import { type DynamicModule, Module, type Provider } from "@nestjs/common";
+import { type DynamicModule, Module, type Provider, type Type } from "@nestjs/common";
 import { DiscoveryModule } from "@nestjs/core";
 
 import { TelegramDecoratorsBinder } from "../binder";
@@ -23,7 +23,6 @@ import { TelegramBotsRegistry } from "../registry";
 import { TelegramBotRunner } from "../runtime";
 import { TG_API, TG_BOT, TG_OPTIONS, TG_WEBHOOK_CALLBACK, makeToken } from "../tokens";
 import type { BotInstanceOptions, TelegramModuleAsyncOptions } from "../types";
-import type { Class } from "../types/class";
 import type { InjectInstances } from "../types/inject-instances";
 import { RegistryModule } from "./registry.module";
 
@@ -123,10 +122,9 @@ export class TelegramModule {
    *
    * @returns A NestJS DynamicModule exposing the same providers as `forRoot`.
    */
-  static forRootAsync<
-    TContext extends GrammyContext = GrammyContext,
-    TDeps extends readonly Class[] = readonly Class[]
-  >(asyncOptions: TelegramModuleAsyncOptions<TContext, TDeps>): DynamicModule {
+  static forRootAsync<TContext extends GrammyContext = GrammyContext, TDeps extends readonly Type[] = readonly Type[]>(
+    asyncOptions: TelegramModuleAsyncOptions<TContext, TDeps>
+  ): DynamicModule {
     const name = asyncOptions.name;
     const ENTRY = makeToken(`TG_ENTRY:${name}`);
 
