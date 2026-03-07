@@ -56,9 +56,7 @@ export interface TelegramModuleAsyncOptions<C extends GrammyContext = GrammyCont
    * })
    * ```
    */
-  readonly useFactory: <TDeps extends readonly unknown[]>(
-    ...deps: TDeps
-  ) => Promise<BotInstanceOptions<C>> | BotInstanceOptions<C>;
+  readonly useFactory: (...deps: any[]) => Promise<BotInstanceOptions<C>> | BotInstanceOptions<C>;
 
   /**
    * Providers to inject into `useFactory`.
