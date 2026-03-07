@@ -19,7 +19,7 @@ import { type DynamicModule, Module, type Provider, type Type } from "@nestjs/co
 import { DiscoveryModule } from "@nestjs/core";
 
 import { TelegramDecoratorsBinder } from "../binder";
-import { TelegramBotsRegistry } from "../registry";
+import { type BotEntry, TelegramBotsRegistry } from "../registry";
 import { TelegramBotRunner } from "../runtime";
 import { TG_API, TG_BOT, TG_OPTIONS, TG_WEBHOOK_CALLBACK, makeToken } from "../tokens";
 import type { BotInstanceOptions, TelegramModuleAsyncOptions } from "../types";
@@ -65,29 +65,29 @@ export class TelegramModule {
     // Create and register the bot once, then expose TG_BOT/TG_API/TG_WEBHOOK_CALLBACK off that entry.
     const entryProvider = {
       provide: ENTRY,
+      inject: [TelegramBotsRegistry],
       async useFactory(registry: TelegramBotsRegistry<TContext>) {
         const runner = new TelegramBotRunner<TContext>(options, registry);
         return runner.run(); // returns BotEntry<C>
-      },
-      inject: [TelegramBotsRegistry]
+      }
     };
 
     const botProvider = {
       provide: TG_BOT(name),
-      useFactory: (entry: any) => entry.bot,
-      inject: [ENTRY]
+      inject: [ENTRY],
+      useFactory: (entry: BotEntry<TContext>) => entry.bot
     };
 
     const apiProvider = {
       provide: TG_API(name),
-      useFactory: (entry: any) => entry.api,
-      inject: [ENTRY]
+      inject: [ENTRY],
+      useFactory: (entry: BotEntry<TContext>) => entry.api
     };
 
     const webhookProvider = {
       provide: TG_WEBHOOK_CALLBACK(name),
-      useFactory: (entry: any) => entry.callback,
-      inject: [ENTRY]
+      inject: [ENTRY],
+      useFactory: (entry: BotEntry<TContext>) => entry.callback
     };
 
     return {
@@ -146,20 +146,20 @@ export class TelegramModule {
 
     const botProvider = {
       provide: TG_BOT(name),
-      useFactory: (entry: any) => entry.bot,
-      inject: [ENTRY]
+      inject: [ENTRY],
+      useFactory: (entry: BotEntry<TContext>) => entry.bot
     };
 
     const apiProvider = {
       provide: TG_API(name),
-      useFactory: (entry: any) => entry.api,
-      inject: [ENTRY]
+      inject: [ENTRY],
+      useFactory: (entry: BotEntry<TContext>) => entry.api
     };
 
     const webhookProvider = {
       provide: TG_WEBHOOK_CALLBACK(name),
-      useFactory: (entry: any) => entry.callback,
-      inject: [ENTRY]
+      inject: [ENTRY],
+      useFactory: (entry: BotEntry<TContext>) => entry.callback
     };
 
     return {
