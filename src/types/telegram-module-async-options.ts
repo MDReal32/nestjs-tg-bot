@@ -18,6 +18,7 @@ import type { Context as GrammyContext } from "grammy";
 import type { Type } from "@nestjs/common";
 
 import type { BotInstanceOptions } from "./bot-instance-options";
+import type { Class } from "./class";
 import type { InjectInstances } from "./inject-instances";
 
 /**
@@ -31,7 +32,7 @@ import type { InjectInstances } from "./inject-instances";
  */
 export interface TelegramModuleAsyncOptions<
   TContext extends GrammyContext = GrammyContext,
-  TDeps extends readonly Type[] = readonly Type[]
+  TDeps extends readonly Class[] = readonly Class[]
 > {
   /**
    * Unique bot name.
