@@ -15,7 +15,7 @@
  */
 import type { Context as GrammyContext } from "grammy";
 
-import { type DynamicModule, Module, type Provider } from "@nestjs/common";
+import { type DynamicModule, Module, type Provider, type Type } from "@nestjs/common";
 import { DiscoveryModule } from "@nestjs/core";
 
 import { TelegramDecoratorsBinder } from "../binder";
@@ -129,12 +129,13 @@ export class TelegramModule {
 
     const asyncOptionsProvider: Provider = {
       provide: TG_OPTIONS(name),
-      useFactory: async (...deps: readonly unknown[]) => asyncOptions.useFactory(...deps)
+      useFactory: (...deps: Type[]) => asyncOptions.useFactory(...deps)
     };
 
     const entryProvider = {
       provide: ENTRY,
-      useFactory: async (registry: TelegramBotsRegistry<C>, opts: BotInstanceOptions<C>) => {
+      async useFactory(registry: TelegramBotsRegistry<C>, opts: BotInstanceOptions<C>) {
+        Object.defineProperty(opts, "name", { value: name, writable: false });
         const runner = new TelegramBotRunner<C>(opts, registry);
         return runner.run();
       },

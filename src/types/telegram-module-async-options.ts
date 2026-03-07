@@ -28,7 +28,14 @@ import type { BotInstanceOptions } from "./bot-instance-options";
  *
  * @typeParam C - The grammY context type.
  */
-export interface TelegramModuleAsyncOptions<C extends GrammyContext = GrammyContext> {
+export interface TelegramModuleAsyncOptions<TContext extends GrammyContext = GrammyContext> {
+  /**
+   * Unique bot name.
+   *
+   * Each async registration must provide its own name.
+   */
+  readonly name: string;
+
   /**
    * A factory function returning the bot options.
    *
@@ -41,7 +48,6 @@ export interface TelegramModuleAsyncOptions<C extends GrammyContext = GrammyCont
    * TelegramModule.forRootAsync({
    *   name: "mybot",
    *   useFactory: async (config: ConfigService) => ({
-   *     name: "mybot",
    *     token: config.get("TELEGRAM_TOKEN"),
    *     logging: true,
    *   }),
@@ -49,7 +55,9 @@ export interface TelegramModuleAsyncOptions<C extends GrammyContext = GrammyCont
    * })
    * ```
    */
-  readonly useFactory: (...deps: Type[]) => Promise<BotInstanceOptions<C>> | BotInstanceOptions<C>;
+  readonly useFactory: (
+    ...deps: Type[]
+  ) => Promise<Omit<BotInstanceOptions<TContext>, "name">> | Omit<BotInstanceOptions<TContext>, "name">;
 
   /**
    * Providers to inject into `useFactory`.
