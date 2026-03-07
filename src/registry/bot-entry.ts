@@ -33,9 +33,9 @@ import type { BotInstanceOptions } from "../types";
  * @typeParam C - The grammY context type.
  * @typeParam CB - The webhook callback type (platform-specific).
  */
-export interface BotEntry<C extends GrammyContext = GrammyContext, CB = unknown> {
+export interface BotEntry<TContext extends GrammyContext = GrammyContext, TCallback = unknown> {
   /** The grammY `Bot` instance for this named bot. */
-  readonly bot: Bot<C>;
+  readonly bot: Bot<TContext>;
 
   /** The grammY `Api` client bound to this bot's token. */
   readonly api: Api;
@@ -45,8 +45,8 @@ export interface BotEntry<C extends GrammyContext = GrammyContext, CB = unknown>
    *
    * The exact type is platform-specific (e.g. `(req, res) => void` for Node).
    */
-  readonly callback?: CB;
+  readonly callback?: TCallback;
 
   /** The resolved, frozen options that initialized this bot. */
-  readonly options: Readonly<BotInstanceOptions<C>>;
+  readonly options: Readonly<BotInstanceOptions<TContext>>;
 }

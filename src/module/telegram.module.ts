@@ -52,7 +52,7 @@ export class TelegramModule {
    *   - `TG_API(name)` → grammY API instance
    *   - `TG_WEBHOOK_CALLBACK(name)` → Webhook callback handler
    */
-  static forRoot<C extends GrammyContext = GrammyContext>(options: BotInstanceOptions<C>): DynamicModule {
+  static forRoot<TContext extends GrammyContext = GrammyContext>(options: BotInstanceOptions<TContext>): DynamicModule {
     const name = options.name;
     const ENTRY = makeToken(`TG_ENTRY:${name}`);
 
@@ -64,8 +64,8 @@ export class TelegramModule {
     // Create and register the bot once, then expose TG_BOT/TG_API/TG_WEBHOOK_CALLBACK off that entry.
     const entryProvider = {
       provide: ENTRY,
-      useFactory: async (registry: TelegramBotsRegistry<C>) => {
-        const runner = new TelegramBotRunner<C>(options, registry);
+      async useFactory(registry: TelegramBotsRegistry<TContext>) {
+        const runner = new TelegramBotRunner<TContext>(options, registry);
         return runner.run(); // returns BotEntry<C>
       },
       inject: [TelegramBotsRegistry]

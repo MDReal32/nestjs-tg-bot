@@ -26,7 +26,7 @@ import type { WebhookOptions } from "./webhook-options";
  *
  * @typeParam C - The grammY context type.
  */
-export interface BotInstanceOptions<C extends GrammyContext = GrammyContext> {
+export interface BotInstanceOptions<TContext extends GrammyContext = GrammyContext> {
   /**
    * Unique bot name.
    *
@@ -69,14 +69,14 @@ export interface BotInstanceOptions<C extends GrammyContext = GrammyContext> {
    *
    * Applied **before** user middlewares.
    */
-  readonly rateLimit?: RateLimitOptions<C>;
+  readonly rateLimit?: RateLimitOptions<TContext>;
 
   /**
    * Custom grammY middlewares.
    *
    * Applied **after** the rate limiter (if enabled).
    */
-  readonly middlewares?: readonly MiddlewareFn<C>[];
+  readonly middlewares?: readonly MiddlewareFn<TContext>[];
 
   /**
    * Options specific to polling mode.
@@ -102,7 +102,7 @@ export interface BotInstanceOptions<C extends GrammyContext = GrammyContext> {
    *
    * If provided, called when a middleware or handler throws.
    */
-  readonly onError?: (err: unknown, ctx?: C) => void;
+  readonly onError?: (err: unknown, ctx?: TContext) => void;
 
   /**
    * Callback triggered when the bot successfully starts.

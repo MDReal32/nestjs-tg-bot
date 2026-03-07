@@ -32,8 +32,8 @@ import type { BotEntry } from "./bot-entry";
  * @typeParam C - The grammY context type.
  * @typeParam CB - The webhook callback type (implementation-specific).
  */
-export class TelegramBotsRegistry<C extends GrammyContext = GrammyContext, CB = unknown> {
-  private readonly map = new Map<string, BotEntry<C, CB>>();
+export class TelegramBotsRegistry<TContext extends GrammyContext = GrammyContext, TCallback = unknown> {
+  private readonly map = new Map<string, BotEntry<TContext, TCallback>>();
   private readonly boundKeys = new Set<string>();
 
   /**
@@ -43,7 +43,7 @@ export class TelegramBotsRegistry<C extends GrammyContext = GrammyContext, CB = 
    * @param entry - The bot entry instance (created by `TelegramBotRunner`).
    * @throws If a bot with the same name already exists.
    */
-  set(name: string, entry: BotEntry<C, CB>): void {
+  set(name: string, entry: BotEntry<TContext, TCallback>): void {
     if (this.map.has(name)) {
       throw new Error(`telegram: bot "${name}" already exists`);
     }
@@ -56,7 +56,7 @@ export class TelegramBotsRegistry<C extends GrammyContext = GrammyContext, CB = 
    * @param name - Bot name.
    * @returns The bot entry, or `undefined` if not found.
    */
-  get(name: string): BotEntry<C, CB> | undefined {
+  get(name: string): BotEntry<TContext, TCallback> | undefined {
     return this.map.get(name);
   }
 
