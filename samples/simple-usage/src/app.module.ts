@@ -5,7 +5,7 @@ import { Module } from "@nestjs/common";
   imports: [
     TelegramModule.forRoot({
       name: "mybot",
-      token: process.env.TELEGRAM_TOKEN!,
+      token: process.env.TELEGRAM_BOT_TOKEN ?? "",
       mode: "auto", // "auto" | "polling" | "webhook"
       logging: true // use NestJS logger
     })

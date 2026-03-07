@@ -1,6 +1,6 @@
 {
   "name": "@mdreal/nestjs-tg-bot",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "NestJS module for building Telegram bots with grammY. Supports multiple bots, decorators, injection, polling, and webhooks.",
   "keywords": [
     "nestjs",
@@ -42,13 +42,17 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@grammyjs/runner": "^2.0.3",
+    "@swc/helpers": "^0.5.19",
     "grammy": "^1.38.3"
   },
   "devDependencies": {
+    "@swc/core": "^1.15.18",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/node": "^24.10.1",
     "prettier": "^3.6.2",
     "prettier-plugin-packagejson": "^2.5.19",
+    "unplugin-swc": "^1.5.9",
     "vite": "^7.2.2",
     "vite-plugin-dts": "^4.5.4"
   },

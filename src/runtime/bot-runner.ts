@@ -15,6 +15,8 @@
  */
 import { type Api, Bot, type Context as GrammyContext, webhookCallback } from "grammy";
 
+import { run, sequentialize } from "@grammyjs/runner";
+
 import { makeLogger } from "../logging/logger";
 import { makeRateLimit } from "../rate-limit/make-rate-limit";
 import type { BotEntry, HttpWebhookCallback, TelegramBotsRegistry } from "../registry";
@@ -79,7 +81,7 @@ export class TelegramBotRunner<C extends GrammyContext = GrammyContext> {
     this.prepare();
 
     if (this.mode === "polling") {
-      await this.startPolling();
+      this.startPolling();
     } else {
       await this.prepareWebhook();
     }
@@ -137,17 +139,16 @@ export class TelegramBotRunner<C extends GrammyContext = GrammyContext> {
   }
 
   /** Start the bot in long-polling mode. */
-  private async startPolling(): Promise<void> {
-    await this.bot.start({
-      ...(this.opts.polling ?? {}),
-      onStart: () => {
-        this.logger.log("Polling started");
-        this.opts.onStart?.({
-          name: this.opts.name,
-          mode: "polling"
-        });
-      }
-    });
+  private startPolling() {
+    this.bot.use(
+      sequentialize(ctx => {
+        const chat = ctx.chat?.id.toString();
+        const user = ctx.from?.id.toString();
+        return [chat, user].filter(con => con !== undefined);
+      })
+    );
+
+    run(this.bot);
   }
 
   /** Prepare the bot in webhook mode (setWebhook + callback). */

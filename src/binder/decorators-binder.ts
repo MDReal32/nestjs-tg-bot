@@ -72,9 +72,8 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
   ) {}
 
   /** Runs at NestJS bootstrap to wire up all decorated handlers. */
-  onApplicationBootstrap(): void {
+  onApplicationBootstrap() {
     const providers = this.discovery.getProviders().filter(w => {
-      // only class-based, instantiated providers
       return !!w.instance && w.metatype && typeof w.metatype === "function";
     });
 
