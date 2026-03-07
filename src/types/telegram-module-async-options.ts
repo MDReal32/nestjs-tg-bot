@@ -18,6 +18,7 @@ import type { Context as GrammyContext } from "grammy";
 import type { Type } from "@nestjs/common";
 
 import type { BotInstanceOptions } from "./bot-instance-options";
+import type { InjectInstances } from "./inject-instances";
 
 /**
  * Async options for registering a bot with `TelegramModule.forRootAsync`.
@@ -28,7 +29,10 @@ import type { BotInstanceOptions } from "./bot-instance-options";
  *
  * @typeParam C - The grammY context type.
  */
-export interface TelegramModuleAsyncOptions<TContext extends GrammyContext = GrammyContext> {
+export interface TelegramModuleAsyncOptions<
+  TContext extends GrammyContext = GrammyContext,
+  TDeps extends readonly Type[] = readonly Type[]
+> {
   /**
    * Unique bot name.
    *
@@ -56,7 +60,7 @@ export interface TelegramModuleAsyncOptions<TContext extends GrammyContext = Gra
    * ```
    */
   readonly useFactory: (
-    ...deps: Type[]
+    ...deps: InjectInstances<TDeps>
   ) => Promise<Omit<BotInstanceOptions<TContext>, "name">> | Omit<BotInstanceOptions<TContext>, "name">;
 
   /**
@@ -64,7 +68,7 @@ export interface TelegramModuleAsyncOptions<TContext extends GrammyContext = Gra
    *
    * Works the same as `@Module({ providers })` injection tokens.
    */
-  readonly inject?: readonly Type[];
+  readonly inject?: TDeps;
 
   /**
    * Additional modules to import when resolving the factory.

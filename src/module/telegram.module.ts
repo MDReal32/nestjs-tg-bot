@@ -23,6 +23,7 @@ import { TelegramBotsRegistry } from "../registry";
 import { TelegramBotRunner } from "../runtime";
 import { TG_API, TG_BOT, TG_OPTIONS, TG_WEBHOOK_CALLBACK, makeToken } from "../tokens";
 import type { BotInstanceOptions, TelegramModuleAsyncOptions } from "../types";
+import type { InjectInstances } from "../types/inject-instances";
 import { RegistryModule } from "./registry.module";
 
 /**
@@ -121,22 +122,22 @@ export class TelegramModule {
    *
    * @returns A NestJS DynamicModule exposing the same providers as `forRoot`.
    */
-  static forRootAsync<C extends GrammyContext = GrammyContext>(
-    asyncOptions: TelegramModuleAsyncOptions<C>
+  static forRootAsync<TContext extends GrammyContext = GrammyContext, TDeps extends readonly Type[] = readonly Type[]>(
+    asyncOptions: TelegramModuleAsyncOptions<TContext, TDeps>
   ): DynamicModule {
     const name = asyncOptions.name;
     const ENTRY = makeToken(`TG_ENTRY:${name}`);
 
     const asyncOptionsProvider: Provider = {
       provide: TG_OPTIONS(name),
-      useFactory: (...deps: Type[]) => asyncOptions.useFactory(...deps)
+      useFactory: (...deps: InjectInstances<TDeps>) => asyncOptions.useFactory(...deps)
     };
 
     const entryProvider = {
       provide: ENTRY,
-      async useFactory(registry: TelegramBotsRegistry<C>, opts: BotInstanceOptions<C>) {
+      async useFactory(registry: TelegramBotsRegistry<TContext>, opts: BotInstanceOptions<TContext>) {
         Object.defineProperty(opts, "name", { value: name, writable: false });
-        const runner = new TelegramBotRunner<C>(opts, registry);
+        const runner = new TelegramBotRunner<TContext>(opts, registry);
         return runner.run();
       },
       inject: [TelegramBotsRegistry, TG_OPTIONS(name)]
