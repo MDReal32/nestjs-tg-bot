@@ -101,7 +101,7 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
         botsNeedingConversations.add(botName);
         for (const def of convDefs) {
           pendingConversations.push({
-            fn: (wrapper.instance as any)[def.method].bind(wrapper.instance),
+            fn: wrapper.instance[def.method].bind(wrapper.instance),
             name: def.name,
             botName
           });
