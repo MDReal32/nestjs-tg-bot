@@ -1,6 +1,8 @@
 import { TelegramModule } from "@mdreal/nestjs-tg-bot";
 import { Module } from "@nestjs/common";
 
+import { BotHandler } from "./bot.handler";
+
 @Module({
   imports: [
     TelegramModule.forRoot({
@@ -9,6 +11,7 @@ import { Module } from "@nestjs/common";
       mode: "auto", // "auto" | "polling" | "webhook"
       logging: true // use NestJS logger
     })
-  ]
+  ],
+  providers: [BotHandler]
 })
 export class AppModule {}
