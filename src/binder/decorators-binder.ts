@@ -18,7 +18,7 @@ import type { Bot, Context as GrammyContext, MiddlewareFn } from "grammy";
 import { Injectable, type OnApplicationBootstrap } from "@nestjs/common";
 import { DiscoveryService } from "@nestjs/core";
 
-import { META_KEYS } from "../decorators";
+import { type CommandOptions, META_KEYS } from "../decorators";
 import { type BotEntry, TelegramBotsRegistry } from "../registry";
 
 /**
@@ -72,7 +72,7 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
   ) {}
 
   /** Runs at NestJS bootstrap to wire up all decorated handlers. */
-  onApplicationBootstrap() {
+  async onApplicationBootstrap() {
     const providers = this.discovery.getProviders().filter(w => {
       return !!w.instance && w.metatype && typeof w.metatype === "function";
     });
@@ -95,7 +95,9 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
       const scopes = resolveScopes(ctor);
 
       const commands =
-        (Reflect.getMetadata(META_KEYS.COMMANDS, ctor) as Array<{ method: string; command: string }> | undefined) ?? [];
+        (Reflect.getMetadata(META_KEYS.COMMANDS, ctor) as
+          | Array<{ method: string; command: string } & CommandOptions>
+          | undefined) ?? [];
       const hears =
         (Reflect.getMetadata(META_KEYS.HEARS, ctor) as
           | Array<{ method: string; trigger: string | RegExp }>
@@ -142,6 +144,9 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
           for (const h of hrs) bot.hears(h.trigger as any, composed);
           for (const o of onsx) bot.on(o.filter as any, composed);
           for (const k of kbs) bot.callbackQuery(k.callback as any, composed);
+          await bot.api.setMyCommands(
+            cmds.filter(c => !c.isHidden).map(c => ({ command: c.command, description: c.description ?? "" }))
+          );
         }
       }
     }

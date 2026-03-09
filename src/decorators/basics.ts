@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from "./command";
+import { Command, type CommandOptions } from "./command";
 
 /**
  * `@Start` decorator
@@ -32,7 +32,7 @@ import { Command } from "./command";
  * }
  * ```
  */
-export const Start = () => Command("start");
+export const Start = (options?: CommandOptions) => Command("start", options);
 
 /**
  * `@Help` decorator
@@ -51,4 +51,4 @@ export const Start = () => Command("start");
  * }
  * ```
  */
-export const Help = () => Command("help");
+export const Help = (options?: CommandOptions) => Command("help", options);

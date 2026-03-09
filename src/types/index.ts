@@ -1,3 +1,4 @@
+export * from "./command-options";
 export * from "./log-level";
 export * from "./logger-fn";
 export * from "./rate-limit-options";

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { META_KEYS } from "./meta-keys";
 
 export interface CommandOptions {
   /** Description shown in the Telegram command menu.
@@ -24,33 +23,3 @@ export interface CommandOptions {
    *  Useful for admin-only or internal commands. */
   isHidden?: boolean;
 }
-
-/**
- * `@Command` decorator
- *
- * Registers a handler method for a Telegram `/command`.
- *
- * @example
- * ```ts
- * @Injectable()
- * export class BotHandlers {
- *   @Command("start", { description: "Start the bot" })
- *   async onStart(ctx: Context) {
- *     await ctx.reply("Hello!");
- *   }
- * }
- * ```
- *
- * @param command - The command string (without `/`).
- * @param options - Optional configuration for the command.
- * @returns Method decorator that stores metadata for `TelegramDecoratorsBinder`.
- */
-export const Command =
-  (command: string, options?: CommandOptions) =>
-  (target: object, propertyKey: string | symbol) => {
-    const ctor = (target as any).constructor ?? target;
-
-    const commands = (Reflect.getMetadata(META_KEYS.COMMANDS, ctor) as any[] | undefined) ?? [];
-    commands.push({ method: propertyKey, command, ...options });
-    Reflect.defineMetadata(META_KEYS.COMMANDS, commands, ctor);
-  };
