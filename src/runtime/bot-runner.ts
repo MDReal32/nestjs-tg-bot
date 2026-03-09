@@ -149,6 +149,8 @@ export class TelegramBotRunner<C extends GrammyContext = GrammyContext> {
     );
 
     run(this.bot);
+    this.opts.onStart?.({ name: this.opts.name, mode: "polling" });
+    this.logger.log("Polling started");
   }
 
   /** Prepare the bot in webhook mode (setWebhook + callback). */
