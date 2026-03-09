@@ -18,8 +18,9 @@ import type { Bot, Context as GrammyContext, MiddlewareFn } from "grammy";
 import { Injectable, type OnApplicationBootstrap } from "@nestjs/common";
 import { DiscoveryService } from "@nestjs/core";
 
-import { type CommandOptions, META_KEYS } from "../decorators";
+import { META_KEYS } from "../decorators";
 import { type BotEntry, TelegramBotsRegistry } from "../registry";
+import type { CommandOptions } from "../types";
 
 /**
  * Compose a stack of grammY middlewares into a single middleware function.
