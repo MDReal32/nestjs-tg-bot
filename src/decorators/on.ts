@@ -43,11 +43,7 @@ import { META_KEYS } from "./meta-keys";
 export const On = (filter: string) => (target: object, propertyKey: string | symbol) => {
   const ctor = (target as any).constructor ?? target;
 
-  // Collect existing @On metadata for this class
-  const list = (Reflect.getMetadata(META_KEYS.ON, ctor) as any[] | undefined) ?? [];
-
-  // Register new event mapping
-  list.push({ method: propertyKey, filter });
-
-  Reflect.defineMetadata(META_KEYS.ON, list, ctor);
+  const ons = (Reflect.getMetadata(META_KEYS.ON, ctor) as any[] | undefined) ?? [];
+  ons.push({ method: propertyKey, filter });
+  Reflect.defineMetadata(META_KEYS.ON, ons, ctor);
 };

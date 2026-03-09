@@ -43,11 +43,7 @@ import { META_KEYS } from "./meta-keys";
 export const Hears = (trigger: string | RegExp) => (target: object, propertyKey: string | symbol) => {
   const ctor = (target as any).constructor ?? target;
 
-  // Collect existing hears metadata for this class
-  const list = (Reflect.getMetadata(META_KEYS.HEARS, ctor) as any[] | undefined) ?? [];
-
-  // Register new hears mapping
-  list.push({ method: propertyKey, trigger });
-
-  Reflect.defineMetadata(META_KEYS.HEARS, list, ctor);
+  const hears = (Reflect.getMetadata(META_KEYS.HEARS, ctor) as any[] | undefined) ?? [];
+  hears.push({ method: propertyKey, trigger });
+  Reflect.defineMetadata(META_KEYS.HEARS, hears, ctor);
 };

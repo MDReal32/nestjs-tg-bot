@@ -37,5 +37,8 @@ export const META_KEYS = {
   ON: Symbol("tg:on"),
 
   /** Registered scopes (`@Scope` / `@Scopes`) for multi-bot apps. */
-  SCOPES: Symbol("tg:scopes")
+  SCOPES: Symbol("tg:scopes"),
+
+  /** Registered `@Conversation` handlers (requires `@grammyjs/conversations`). */
+  CONVERSATIONS: Symbol("tg:conversations")
 } as const;

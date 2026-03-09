@@ -37,11 +37,7 @@ import { META_KEYS } from "./meta-keys";
 export const Command = (command: string) => (target: object, propertyKey: string | symbol) => {
   const ctor = (target as any).constructor ?? target;
 
-  // Collect existing command metadata for this class
-  const list = (Reflect.getMetadata(META_KEYS.COMMANDS, ctor) as any[] | undefined) ?? [];
-
-  // Register new command mapping
-  list.push({ method: propertyKey, command });
-
-  Reflect.defineMetadata(META_KEYS.COMMANDS, list, ctor);
+  const commands = (Reflect.getMetadata(META_KEYS.COMMANDS, ctor) as any[] | undefined) ?? [];
+  commands.push({ method: propertyKey, command });
+  Reflect.defineMetadata(META_KEYS.COMMANDS, commands, ctor);
 };
