@@ -5,7 +5,7 @@ import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class BotHandler {
-  @Start()
+  @Start({ description: "Any description", isHidden: false })
   async start(ctx: Context) {
     const kb = new InlineKeyboard();
     kb.text("Click me!", "click");
