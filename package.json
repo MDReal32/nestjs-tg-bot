@@ -47,6 +47,7 @@
     "grammy": "^1.38.3"
   },
   "devDependencies": {
+    "@grammyjs/conversations": "^2.1.1",
     "@swc/core": "^1.15.18",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/node": "^24.10.1",
@@ -57,9 +58,15 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@grammyjs/conversations": "^2.0.0",
     "@nestjs/common": "^10 || ^11",
     "@nestjs/core": "^10 || ^11",
     "reflect-metadata": "^0.2"
+  },
+  "peerDependenciesMeta": {
+    "@grammyjs/conversations": {
+      "optional": true
+    }
   },
   "packageManager": "pnpm@9.15.3+sha512.1f79bc245a66eb0b07c5d4d83131240774642caaa86ef7d0434ab47c0d16f66b04e21e0c086eb61e62c77efc4d7f7ec071afad3796af64892fae66509173893a",
   "engines": {
