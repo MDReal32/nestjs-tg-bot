@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Bot, Context as GrammyContext, MiddlewareFn, NextFunction } from "grammy";
+import type { Bot, Context as GrammyContext, MiddlewareFn } from "grammy";
 
 import { Injectable, type OnApplicationBootstrap } from "@nestjs/common";
 import { DiscoveryService } from "@nestjs/core";
