@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command, type CommandOptions } from "./command";
+import type { CommandOptions } from "../types";
+import { Command } from "./command";
 
 /**
  * `@Start` decorator
