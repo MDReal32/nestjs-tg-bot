@@ -23,6 +23,7 @@ This package provides a clean, modular approach to integrating grammY bots into 
 
   * `@Command("...")`, `@Hears("...")`, `@On("...")`, `@Use()`
   * Shorthands: `@Start()`, `@Help()`
+  * `@Conversation("name")` for conversational flows (requires `@grammyjs/conversations`)
 
 * **Scoped Handlers**
   `@Scope("botName")` / `@Scopes([...])` let you control which bot executes which handler.
@@ -124,6 +125,45 @@ export class BetaHandlers {
 
 ---
 
+## 💬 Conversations
+
+Conversational flows are supported via the optional [`@grammyjs/conversations`](https://grammy.dev/plugins/conversations) peer dependency.
+
+```bash
+pnpm add @grammyjs/conversations
+```
+
+Mark any method with `@Conversation()` and the binder will automatically install the `conversations()` middleware and register the handler with `createConversation()` at bootstrap.
+
+```ts
+import { Injectable } from "@nestjs/common";
+import { Start, Conversation } from "@mdreal/nestjs-tg-bot";
+import type { Conversation as Conv, ConversationFlavor } from "@grammyjs/conversations";
+import type { Context } from "grammy";
+
+type MyContext = ConversationFlavor<Context>;
+
+@Injectable()
+export class BotHandlers {
+  @Start()
+  async onStart(ctx: MyContext) {
+    await ctx.conversation.enter("collect");
+  }
+
+  @Conversation("collect")
+  async collect(conversation: Conv<MyContext>, ctx: MyContext) {
+    await ctx.reply("What is your name?");
+    const { message } = await conversation.waitFor("message:text");
+    await ctx.reply(`Hello, ${message.text}!`);
+  }
+}
+```
+
+> **Note:** The `@Conversation` name (e.g. `"collect"`) must match the string passed to `ctx.conversation.enter("collect")`.
+> If no name is provided, the method name is used as the conversation identifier.
+
+---
+
 ## 💉 Dependency Injection
 
 ```ts
@@ -174,6 +214,7 @@ TelegramModule.forRoot({
 * Multi-bot support with `@Scope` / `@Scopes`
 * Injection helpers: `@InjectBot`, `@InjectApi`, `@InjectWebhook`, `@InjectOptions`
 * Auto-binding via `DiscoveryService`
+* `@Conversation()` — optional conversational flows via `@grammyjs/conversations`
 
 ### 🚧 Planned Built-ins
 
@@ -182,10 +223,11 @@ TelegramModule.forRoot({
 * `@Throttle(ms)` — simple per-user throttling for spam control
 * `@Alias("...")` — define multiple triggers for the same command
 * `@Fallback()` — catch-all handler for unrecognized input
-* `@InlineQuery()` — shorthand for inline query events
-* `@ChosenInlineResult()` — shorthand for chosen inline results
-* `@CallbackQuery("...")` — decorator for handling button callbacks
 * Auto-generated `/help` command that aggregates available commands
+
+### 🚫 Won't Implement
+
+* ~~`@InlineQuery()`~~ / ~~`@ChosenInlineResult()`~~ / ~~`@CallbackQuery("...")`~~ — use `@On(...)` or handle inside `@Conversation`
 
 ### 🛠 Infrastructure
 
