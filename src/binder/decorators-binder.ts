@@ -20,7 +20,10 @@ import { DiscoveryService } from "@nestjs/core";
 
 import { META_KEYS } from "../decorators";
 import { type BotEntry, TelegramBotsRegistry } from "../registry";
-import type { CommandOptions } from "../types";
+import type { CommandMeta, ConversationMeta, HearsMeta, KeyboardCallbackMeta, OnMeta } from "../types";
+
+type PendingConversation = { fn: Function; name: string; botName: string };
+type CommandEntry = { command: string; description: string };
 
 /**
  * Compose a stack of grammY middlewares into a single middleware function.
@@ -89,13 +92,11 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
     };
 
     const botsNeedingConversations = new Set<string>();
-    const pendingConversations: Array<{ fn: Function; name: string; botName: string }> = [];
+    const pendingConversations: PendingConversation[] = [];
 
     for (const wrapper of providers) {
       const ctor = wrapper.metatype as Function;
-      const convDefs =
-        (Reflect.getMetadata(META_KEYS.CONVERSATIONS, ctor) as Array<{ method: string; name: string }> | undefined) ??
-        [];
+      const convDefs = (Reflect.getMetadata(META_KEYS.CONVERSATIONS, ctor) as ConversationMeta[] | undefined) ?? [];
       if (convDefs.length === 0) continue;
 
       for (const botName of resolveScopes(ctor)) {
@@ -135,7 +136,8 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
       }
     }
 
-    // Pass 2: commands, hears, on, keyboard callbacks
+    const nameCommandsMapping: Record<string, CommandEntry[]> = {};
+
     for (const wrapper of providers) {
       const instance = wrapper.instance as object;
       const ctor = wrapper.metatype as Function;
@@ -143,20 +145,10 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
       const classMW = (Reflect.getMetadata(META_KEYS.CLASS_USE, ctor) as MiddlewareFn[] | undefined) ?? [];
       const scopes = resolveScopes(ctor);
 
-      const commands =
-        (Reflect.getMetadata(META_KEYS.COMMANDS, ctor) as
-          | Array<{ method: string; command: string } & CommandOptions>
-          | undefined) ?? [];
-      const hears =
-        (Reflect.getMetadata(META_KEYS.HEARS, ctor) as
-          | Array<{ method: string; trigger: string | RegExp }>
-          | undefined) ?? [];
-      const ons =
-        (Reflect.getMetadata(META_KEYS.ON, ctor) as Array<{ method: string; filter: string }> | undefined) ?? [];
-      const keyboardCallbacks =
-        (Reflect.getMetadata(META_KEYS.KEYBOARD_CALLBACKS, ctor) as
-          | Array<{ method: string; callback: string }>
-          | undefined) ?? [];
+      const commands = (Reflect.getMetadata(META_KEYS.COMMANDS, ctor) as CommandMeta[] | undefined) ?? [];
+      const hears = (Reflect.getMetadata(META_KEYS.HEARS, ctor) as HearsMeta[] | undefined) ?? [];
+      const ons = (Reflect.getMetadata(META_KEYS.ON, ctor) as OnMeta[] | undefined) ?? [];
+      const keyboardCallbacks = (Reflect.getMetadata(META_KEYS.KEYBOARD_CALLBACKS, ctor) as KeyboardCallbackMeta[] | undefined) ?? [];
 
       if (commands.length === 0 && hears.length === 0 && ons.length === 0) continue;
 
@@ -193,11 +185,19 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
           for (const h of hrs) bot.hears(h.trigger as any, composed);
           for (const o of onsx) bot.on(o.filter as any, composed);
           for (const k of kbs) bot.callbackQuery(k.callback as any, composed);
-          await bot.api.setMyCommands(
-            cmds.filter(c => !c.isHidden).map(c => ({ command: c.command, description: c.description ?? "" }))
+
+          (nameCommandsMapping[botName] ??= []).push(
+            ...cmds.filter(c => !c.isHidden).map(c => ({ command: c.command, description: c.description ?? "" }))
           );
         }
       }
     }
+
+    await Promise.all(
+      Object.entries(nameCommandsMapping).map(([botName, cmds]) => {
+        const entry = this.registry.get(botName) as BotEntry | undefined;
+        return entry?.api.setMyCommands(cmds);
+      })
+    );
   }
 }
