@@ -21,9 +21,10 @@ This package provides a clean, modular approach to integrating grammY bots into 
 * **Decorator-based API**
   Write expressive and concise handlers with decorators:
 
-  * `@Command("...")`, `@Hears("...")`, `@On("...")`, `@Use()`
-  * Shorthands: `@Start()`, `@Help()`
+  * `@Command("...", { description, isHidden })`, `@Hears("...")`, `@On("...")`, `@Use()`
+  * Shorthands: `@Start()`, `@Help()` — accept the same `CommandOptions`
   * `@Conversation("name")` for conversational flows (requires `@grammyjs/conversations`)
+  * Commands are auto-registered via `bot.api.setMyCommands()` at bootstrap
 
 * **Scoped Handlers**
   `@Scope("botName")` / `@Scopes([...])` let you control which bot executes which handler.
@@ -79,22 +80,29 @@ export class AppModule {}
 
 ```ts
 import { Injectable } from "@nestjs/common";
-import { Start, Help } from "@mdreal/nestjs-tg-bot";
+import { Command, Start, Help } from "@mdreal/nestjs-tg-bot";
 import type { Context } from "grammy";
 
 @Injectable()
 export class BotHandlers {
-  @Start()
+  @Start({ description: "Start the bot" })
   async onStart(ctx: Context) {
     await ctx.reply("Welcome to the bot!");
   }
 
-  @Help()
+  @Help({ description: "Show help" })
   async onHelp(ctx: Context) {
     await ctx.reply("Available commands: /start, /help");
   }
+
+  @Command("secret", { description: "Admin only", isHidden: true })
+  async onSecret(ctx: Context) {
+    await ctx.reply("Shh.");
+  }
 }
 ```
+
+> Commands without `isHidden: true` are automatically registered with Telegram via `setMyCommands()` at bootstrap.
 
 ---
 
@@ -210,7 +218,7 @@ TelegramModule.forRoot({
 
 ### ✅ Implemented
 
-* Core decorators: `@Command`, `@Start`, `@Help`, `@Hears`, `@On`, `@Use`
+* Core decorators: `@Command`, `@Start`, `@Help`, `@Hears`, `@On`, `@Use` — commands auto-register via `setMyCommands()` using `CommandOptions`
 * Multi-bot support with `@Scope` / `@Scopes`
 * Injection helpers: `@InjectBot`, `@InjectApi`, `@InjectWebhook`, `@InjectOptions`
 * Auto-binding via `DiscoveryService`
