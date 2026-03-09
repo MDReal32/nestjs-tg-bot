@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Bot, Context as GrammyContext, MiddlewareFn } from "grammy";
+import type { Bot, Context as GrammyContext, MiddlewareFn, NextFunction } from "grammy";
 
 import { Injectable, type OnApplicationBootstrap } from "@nestjs/common";
 import { DiscoveryService } from "@nestjs/core";
@@ -80,20 +80,19 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
     const allNames = this.registry.names();
     if (allNames.length === 0) return;
 
+    const resolveScopes = (ctor: Function): string[] => {
+      let scopes = (Reflect.getMetadata(META_KEYS.SCOPES, ctor) as string[] | undefined) ?? [];
+      if (scopes.length === 0 && allNames.length === 1) scopes = allNames;
+      if (scopes.length === 0) scopes = allNames;
+      return scopes;
+    };
+
     for (const wrapper of providers) {
       const instance = wrapper.instance as object;
       const ctor = wrapper.metatype as Function;
 
-      // Gather class-level metadata
       const classMW = (Reflect.getMetadata(META_KEYS.CLASS_USE, ctor) as MiddlewareFn[] | undefined) ?? [];
-      let scopes = (Reflect.getMetadata(META_KEYS.SCOPES, ctor) as string[] | undefined) ?? ([] as string[]);
-
-      // Default scope: single bot
-      if (scopes.length === 0 && allNames.length === 1) {
-        scopes = allNames;
-      }
-      // If still empty, bind to all
-      if (scopes.length === 0) scopes = allNames;
+      const scopes = resolveScopes(ctor);
 
       const commands =
         (Reflect.getMetadata(META_KEYS.COMMANDS, ctor) as Array<{ method: string; command: string }> | undefined) ?? [];
@@ -104,10 +103,8 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
       const ons =
         (Reflect.getMetadata(META_KEYS.ON, ctor) as Array<{ method: string; filter: string }> | undefined) ?? [];
 
-      // Skip if provider has no decorated methods
       if (commands.length === 0 && hears.length === 0 && ons.length === 0) continue;
 
-      // Inspect all instance methods
       const proto = Object.getPrototypeOf(instance);
       const methodNames = Object.getOwnPropertyNames(proto).filter(n => n !== "constructor");
 
@@ -115,28 +112,24 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
         const desc = Object.getOwnPropertyDescriptor(proto, name);
         if (!desc || typeof desc.value !== "function") continue;
 
-        // Collect method-level middlewares
         const methodMW =
           (Reflect.getMetadata(META_KEYS.METHOD_USE, instance, name) as MiddlewareFn[] | undefined) ?? [];
 
-        // Find decorators targeting this method
         const cmds = commands.filter(x => x.method === name);
         const hrs = hears.filter(x => x.method === name);
         const onsx = ons.filter(x => x.method === name);
 
         if (cmds.length === 0 && hrs.length === 0 && onsx.length === 0) continue;
 
-        // Compose final handler: class @Use -> method @Use -> handler
         const handler = desc.value.bind(instance) as MiddlewareFn;
         const composed = compose([...classMW, ...methodMW], handler);
 
-        // Bind to each scoped bot
         for (const botName of scopes) {
           const entry = this.registry.get(botName) as BotEntry | undefined;
           if (!entry) continue;
 
           const bindKey = `${ctor.name}:${name}:${botName}`;
-          if (!this.registry.guardBinding(bindKey)) continue; // skip if already bound
+          if (!this.registry.guardBinding(bindKey)) continue;
 
           const bot = entry.bot as Bot;
 
