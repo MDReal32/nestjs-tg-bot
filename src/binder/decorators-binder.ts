@@ -87,6 +87,54 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
       return scopes;
     };
 
+    const botsNeedingConversations = new Set<string>();
+    const pendingConversations: Array<{ fn: Function; name: string; botName: string }> = [];
+
+    for (const wrapper of providers) {
+      const ctor = wrapper.metatype as Function;
+      const convDefs =
+        (Reflect.getMetadata(META_KEYS.CONVERSATIONS, ctor) as Array<{ method: string; name: string }> | undefined) ??
+        [];
+      if (convDefs.length === 0) continue;
+
+      for (const botName of resolveScopes(ctor)) {
+        botsNeedingConversations.add(botName);
+        for (const def of convDefs) {
+          pendingConversations.push({
+            fn: (wrapper.instance as any)[def.method].bind(wrapper.instance),
+            name: def.name,
+            botName
+          });
+        }
+      }
+    }
+
+    if (botsNeedingConversations.size > 0) {
+      let convMod: typeof import("@grammyjs/conversations");
+      try {
+        convMod = await import("@grammyjs/conversations");
+      } catch {
+        throw new Error(
+          'Optional peer "@grammyjs/conversations" is required when using @Conversation(). ' +
+            "Install it: pnpm add @grammyjs/conversations"
+        );
+      }
+
+      for (const botName of botsNeedingConversations) {
+        const entry = this.registry.get(botName) as BotEntry | undefined;
+        if (!entry) continue;
+        (entry.bot as Bot<any>).use(convMod.conversations());
+      }
+
+      for (const { fn, name, botName } of pendingConversations) {
+        const entry = this.registry.get(botName) as BotEntry | undefined;
+        if (!entry) continue;
+        if (!this.registry.guardBinding(`conv:${name}:${botName}`)) continue;
+        (entry.bot as Bot<any>).use(convMod.createConversation(fn as any, name));
+      }
+    }
+
+    // Pass 2: commands, hears, on, keyboard callbacks
     for (const wrapper of providers) {
       const instance = wrapper.instance as object;
       const ctor = wrapper.metatype as Function;
