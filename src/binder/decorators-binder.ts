@@ -102,6 +102,10 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
           | undefined) ?? [];
       const ons =
         (Reflect.getMetadata(META_KEYS.ON, ctor) as Array<{ method: string; filter: string }> | undefined) ?? [];
+      const keyboardCallbacks =
+        (Reflect.getMetadata(META_KEYS.KEYBOARD_CALLBACKS, ctor) as
+          | Array<{ method: string; callback: string }>
+          | undefined) ?? [];
 
       if (commands.length === 0 && hears.length === 0 && ons.length === 0) continue;
 
@@ -118,8 +122,9 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
         const cmds = commands.filter(x => x.method === name);
         const hrs = hears.filter(x => x.method === name);
         const onsx = ons.filter(x => x.method === name);
+        const kbs = keyboardCallbacks.filter(x => x.method === name);
 
-        if (cmds.length === 0 && hrs.length === 0 && onsx.length === 0) continue;
+        if (cmds.length === 0 && hrs.length === 0 && onsx.length === 0 && kbs.length === 0) continue;
 
         const handler = desc.value.bind(instance) as MiddlewareFn;
         const composed = compose([...classMW, ...methodMW], handler);
@@ -136,6 +141,7 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
           for (const c of cmds) bot.command(c.command, composed);
           for (const h of hrs) bot.hears(h.trigger as any, composed);
           for (const o of onsx) bot.on(o.filter as any, composed);
+          for (const k of kbs) bot.callbackQuery(k.callback as any, composed);
         }
       }
     }

@@ -4,7 +4,7 @@ import "reflect-metadata";
 export { TelegramModule } from "./module/telegram.module";
 
 // Handler decorators
-export { Command, Conversation, Start, Help, Hears, On, Use, Scope, Scopes } from "./decorators";
+export * from "./decorators";
 
 // Injection decorators
 export { InjectBot, InjectApi, InjectWebhook, InjectOptions } from "./tokens";

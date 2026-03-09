@@ -3,6 +3,7 @@ export * from "./use";
 export * from "./command";
 export * from "./conversation";
 export * from "./hears";
+export * from "./keyboard-callback";
 export * from "./on";
 export * from "./scope";
 export * from "./basics";
