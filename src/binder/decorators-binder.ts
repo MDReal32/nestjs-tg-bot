@@ -148,9 +148,10 @@ export class TelegramDecoratorsBinder implements OnApplicationBootstrap {
       const commands = (Reflect.getMetadata(META_KEYS.COMMANDS, ctor) as CommandMeta[] | undefined) ?? [];
       const hears = (Reflect.getMetadata(META_KEYS.HEARS, ctor) as HearsMeta[] | undefined) ?? [];
       const ons = (Reflect.getMetadata(META_KEYS.ON, ctor) as OnMeta[] | undefined) ?? [];
-      const keyboardCallbacks = (Reflect.getMetadata(META_KEYS.KEYBOARD_CALLBACKS, ctor) as KeyboardCallbackMeta[] | undefined) ?? [];
+      const keyboardCallbacks =
+        (Reflect.getMetadata(META_KEYS.KEYBOARD_CALLBACKS, ctor) as KeyboardCallbackMeta[] | undefined) ?? [];
 
-      if (commands.length === 0 && hears.length === 0 && ons.length === 0) continue;
+      if (commands.length === 0 && hears.length === 0 && ons.length === 0 && keyboardCallbacks.length === 0) continue;
 
       const proto = Object.getPrototypeOf(instance);
       const methodNames = Object.getOwnPropertyNames(proto).filter(n => n !== "constructor");
