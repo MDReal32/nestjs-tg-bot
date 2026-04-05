@@ -44,7 +44,8 @@
   "dependencies": {
     "@grammyjs/runner": "^2.0.3",
     "@swc/helpers": "^0.5.19",
-    "grammy": "^1.38.3"
+    "grammy": "^1.38.3",
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@grammyjs/conversations": "^2.1.1",
