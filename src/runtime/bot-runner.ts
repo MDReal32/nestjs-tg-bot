@@ -77,7 +77,7 @@ export class TelegramBotRunner<C extends GrammyContext = GrammyContext> {
    *
    * @returns The frozen `BotEntry` for this bot.
    */
-  async run(): Promise<BotEntry<C>> {
+  async run() {
     this.prepare();
 
     if (this.mode === "polling") {
@@ -102,7 +102,7 @@ export class TelegramBotRunner<C extends GrammyContext = GrammyContext> {
    *
    * @param onStopped - Optional callback invoked after stop completes.
    */
-  async stop(onStopped?: (info: { readonly name: string }) => void): Promise<void> {
+  async stop(onStopped?: (info: { readonly name: string }) => void) {
     try {
       await this.bot.stop();
       onStopped?.({ name: this.opts.name });
@@ -113,7 +113,7 @@ export class TelegramBotRunner<C extends GrammyContext = GrammyContext> {
   }
 
   /** Prepare the bot instance, plugins, middlewares, and error handling. */
-  private prepare(): void {
+  private prepare() {
     this.bot = new Bot<C>(this.opts.token);
 
     // Apply API plugins
@@ -154,7 +154,7 @@ export class TelegramBotRunner<C extends GrammyContext = GrammyContext> {
   }
 
   /** Prepare the bot in webhook mode (setWebhook + callback). */
-  private async prepareWebhook(): Promise<void> {
+  private async prepareWebhook() {
     this.callback = webhookCallback(this.bot, "http");
 
     const url = this.opts.webhook?.url;

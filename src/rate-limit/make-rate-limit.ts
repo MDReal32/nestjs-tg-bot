@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Context as GrammyContext, MiddlewareFn } from "grammy";
+import type { Context as GrammyContext, NextFunction } from "grammy";
 
 import type { RateLimitOptions } from "../types";
 
@@ -42,9 +42,7 @@ import type { RateLimitOptions } from "../types";
  * @param opts - Rate limiting configuration.
  * @returns A `MiddlewareFn` if enabled, otherwise `undefined`.
  */
-export const makeRateLimit = <C extends GrammyContext = GrammyContext>(
-  opts?: RateLimitOptions<C>
-): MiddlewareFn<C> | undefined => {
+export const makeRateLimit = <C extends GrammyContext = GrammyContext>(opts?: RateLimitOptions<C>) => {
   if (!opts?.enabled) return undefined;
 
   const windowMs = opts.windowMs ?? 10_000;
@@ -53,7 +51,7 @@ export const makeRateLimit = <C extends GrammyContext = GrammyContext>(
 
   const hits = new Map<string, { count: number; reset: number }>();
 
-  return async (ctx, next) => {
+  return async (ctx: C, next: NextFunction) => {
     const key = keyFn(ctx);
     const now = Date.now();
 

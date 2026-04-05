@@ -37,4 +37,4 @@ export type Token = string & { readonly __brand: "TelegramModuleToken" };
  * @param s - The base string value.
  * @returns A branded `Token` usable as a NestJS provider key.
  */
-export const makeToken = (s: string): Token => s as Token;
+export const makeToken = (s: string) => s as Token;

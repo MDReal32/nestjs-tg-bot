@@ -43,7 +43,7 @@ import type { LogLevel, LoggingOptions } from "../types";
  * @param cfg - Boolean or `LoggingOptions` to control logging behavior.
  * @returns A configured `Logger` instance.
  */
-export const makeLogger = (name: string, cfg?: boolean | LoggingOptions): Logger => {
+export const makeLogger = (name: string, cfg?: boolean | LoggingOptions) => {
   const context = `TelegramBot:${name}`;
   const base = new Logger(context);
 

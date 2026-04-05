@@ -43,7 +43,7 @@ export class TelegramBotsRegistry<TContext extends GrammyContext = GrammyContext
    * @param entry - The bot entry instance (created by `TelegramBotRunner`).
    * @throws If a bot with the same name already exists.
    */
-  set(name: string, entry: BotEntry<TContext, TCallback>): void {
+  set(name: string, entry: BotEntry<TContext, TCallback>) {
     if (this.map.has(name)) {
       throw new Error(`telegram: bot "${name}" already exists`);
     }
@@ -56,7 +56,7 @@ export class TelegramBotsRegistry<TContext extends GrammyContext = GrammyContext
    * @param name - Bot name.
    * @returns The bot entry, or `undefined` if not found.
    */
-  get(name: string): BotEntry<TContext, TCallback> | undefined {
+  get(name: string) {
     return this.map.get(name);
   }
 
@@ -66,7 +66,7 @@ export class TelegramBotsRegistry<TContext extends GrammyContext = GrammyContext
    * @param name - Bot name.
    * @returns `true` if registered, otherwise `false`.
    */
-  has(name: string): boolean {
+  has(name: string) {
     return this.map.has(name);
   }
 
@@ -75,7 +75,7 @@ export class TelegramBotsRegistry<TContext extends GrammyContext = GrammyContext
    *
    * @returns An array of bot names.
    */
-  names(): string[] {
+  names() {
     return Array.from(this.map.keys());
   }
 
@@ -89,7 +89,7 @@ export class TelegramBotsRegistry<TContext extends GrammyContext = GrammyContext
    * @returns `true` if this is the first time the key is seen,
    *          `false` if it was already bound.
    */
-  guardBinding(key: string): boolean {
+  guardBinding(key: string) {
     if (this.boundKeys.has(key)) return false;
     this.boundKeys.add(key);
     return true;

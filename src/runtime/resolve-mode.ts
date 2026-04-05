@@ -41,7 +41,7 @@ export type RunnerMode = NonNullable<Exclude<BotInstanceOptions["mode"], "auto">
  * @param opts - The bot instance options.
  * @returns The resolved runtime mode.
  */
-export const resolveMode = <C extends GrammyContext>(opts: BotInstanceOptions<C>): RunnerMode => {
+export const resolveMode = <C extends GrammyContext>(opts: BotInstanceOptions<C>) => {
   const m = opts.mode ?? "auto";
   return m === "auto" ? (opts.webhook?.url ? "webhook" : "polling") : m;
 };
